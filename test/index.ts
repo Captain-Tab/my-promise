@@ -1,7 +1,13 @@
+import { doesNotReject, rejects } from 'assert';
 import * as chai from 'chai';
+import { resolve } from 'dns';
+import * as sinon from 'sinon';
+import * as sinonChai from 'sinon-chai'
+import Promise from '../src/promise';
+chai.use(sinonChai)
+
 
 const assert = chai.assert;
-import Promise from '../src/promise'
 
 describe("Promise", ()=> {
   it("is class", ()=> {
@@ -23,29 +29,28 @@ describe("Promise", ()=> {
     assert.isFunction(promise.then)
   })
   it('new Promise excute fn function immediately', ()=> {
-    let called = false
-    const promise = new Promise((resolve, reject)=> {
-      called = true
+    let fn = sinon.fake()
+    new Promise(fn)
+    assert(fn.called)
+  })
+  it('new Promise(fn) 中的fn receive two functions', (done)=> {
+    new Promise((resolve, reject)=> {
       assert.isFunction(resolve)
       assert.isFunction(reject)
+      done()
     })
-    // @ts-ignore
-    assert(called === true)
   })
   it('Promise will excute success function after reslove has been called', (done)=> {
-    let called = false
+    const success = sinon.fake()
     const promise = new Promise((resolve, reject)=> {
-      assert(called === false)
+      assert.isFalse(success.called)
       resolve()
       setTimeout(()=> {
-        assert(called === true)
+        assert.isTrue(success.called)
         done()
-      },0) 
+      })
     })
     // @ts-ignore
-    promise.then(()=> {
-      called = true
-    })
+    promise.then(success)
   })
-
 });
