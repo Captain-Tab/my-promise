@@ -1,6 +1,4 @@
-import { doesNotReject, rejects } from 'assert';
 import * as chai from 'chai';
-import { resolve } from 'dns';
 import * as sinon from 'sinon';
 import * as sinonChai from 'sinon-chai'
 import Promise from '../src/promise';
@@ -142,5 +140,33 @@ describe("Promise", ()=> {
       assert(callbacks[2].calledAfter(callbacks[1]))
       done()
     }, 0)
+  })
+  it('2.2.7 promise.then returns promise', ()=> {
+    const promise = new Promise(resolve => {
+      resolve()
+    })
+    const promise2 = promise.then(()=> {}, ()=> {})
+    assert(promise2 instanceof  Promise)
+  })
+  it('2.2.7.1', (done)=> {
+    const promise = new Promise(resolve => {
+      resolve()
+    })
+    promise.then(()=> 'succeed', ()=> 'fail').then((result)=> {
+      assert.equal(result, 'succeed')
+      done()
+    })
+  })
+  it('2.2.7.2, x is a promise', (done)=> {
+    const promise = new Promise(resolve => {
+      resolve()
+    })
+    const fn = sinon.fake()
+    const promise2 = promise.then(()=> new Promise((resolve)=> {resolve()}))
+    promise2.then(fn)
+    setTimeout(()=> {
+      assert(fn.called)
+      done()
+    }, 10)
   })
 });

@@ -1,5 +1,6 @@
 /node_modules/
 /yarn.lock
 .vscode
+.idea
 /package-lock.json
 /yarn-error.log
