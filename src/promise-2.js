@@ -175,3 +175,21 @@ Promise.race = function (promiseList) {
   })
 }
 
+let p1 = Promise.resolve(1);
+p1.then((value) => {
+  console.log('11', value);
+}).then((value) => {
+  throw 'err';
+}).then((value) => {
+  console.log(22);
+}).catch((e) => {
+  console.log('error'. e)
+})
+
+let p3 = new Promise(res=> res(1));
+p3.then((value) => {
+  console.log('11', value);
+  throw 'eee'
+}).then((value) => {
+  console.log('value', value)
+}).catch(e=> console.log('error', e))
