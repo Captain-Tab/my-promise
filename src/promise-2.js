@@ -6,6 +6,7 @@ function Promise(executor) {
   this.promiseResult = null;
   //用于保存异步回调函数列表
   this.callbackList = [];
+
   const resolve = val => {
     // 状态只能修改一次
     if (this.promiseState !== 'pending') return;
@@ -99,6 +100,7 @@ Promise.prototype.then = function (onResolved, onRejected) {
     * 因为promise实例阔以指定多个回调，于是采用数组 
     */
     if (this.promiseState === 'pending') {
+      console.log('waiting')
       this.callbackList.push({
         onResolved: () => {
           handleCallback(onResolved);
@@ -110,10 +112,20 @@ Promise.prototype.then = function (onResolved, onRejected) {
     }
   })
 }
+
 //catch方法
 Promise.prototype.catch = function (onRejected) {
   //  我们可以直接使用then方法实现
   return this.then(undefined, onRejected);
+}
+
+//finally方法
+Promise.prototype.finally = function (callback) {
+  return this.then((value) => {
+    return Promise.resolve(callback).then(()=> value)
+  }, (error) => {
+    return Promise.resolve(callback).then(() => { throw error})
+  })
 }
 
 //resolve方法
@@ -127,7 +139,7 @@ Promise.resolve = function (val) {
         reject(err);
       });
     } else {
-      resolve(value);
+      resolve(val);
     }
   })
 }
@@ -175,7 +187,7 @@ Promise.race = function (promiseList) {
   })
 }
 
-let p1 = Promise.resolve(1);
+let p1 = Promise.resolve(1)
 p1.then((value) => {
   console.log('11', value);
 }).then((value) => {
@@ -186,10 +198,21 @@ p1.then((value) => {
   console.log('error'. e)
 })
 
-let p3 = new Promise(res=> res(1));
+let p3 = Promise.resolve(1);
 p3.then((value) => {
-  console.log('11', value);
-  throw 'eee'
+  const test = Promise.resolve('tab')
+  return test
 }).then((value) => {
-  console.log('value', value)
-}).catch(e=> console.log('error', e))
+  console.log('value2', value)
+})
+
+let p4 = new Promise((resolve, reject) => {
+  // asynchronous
+  setTimeout(() => {
+    resolve(2) 
+  }, 1000)
+})
+
+p4.then((res) => {
+  console.log('res', res)
+})
