@@ -216,3 +216,23 @@ let p4 = new Promise((resolve, reject) => {
 p4.then((res) => {
   console.log('res', res)
 })
+
+
+function* myGenerator() {
+  console.log(yield Promise.resolve(1))   //1
+  console.log(yield Promise.resolve(2))   //2
+  console.log(yield Promise.resolve(3))   //3
+}
+
+// 手动执行迭代器
+const gen = myGenerator()
+gen.next().value.then(val => {
+  console.log('1', val)
+  gen.next(val).value.then(val => {
+    console.log('2', val)
+    gen.next(val).value.then(val => {
+      console.log('3', val)
+      gen.next(val)
+    })
+  })
+})
