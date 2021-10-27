@@ -187,6 +187,21 @@ Promise.race = function (promiseList) {
   })
 }
 
+// allSettled
+Promise.allSettled = function (promiseList) {
+  const wrapFunc = (promiseList) => {
+    promiseList.map(promise => {
+      promise.then((value) => {
+        return { status: 'ok', value }
+      },
+        (reeason) => {
+        return { status: 'fail', reason}
+      })
+    })
+  }
+  return Promise.all(wrapFunc(promiseList))
+}
+
 let p1 = Promise.resolve(1)
 p1.then((value) => {
   console.log('11', value);
@@ -217,22 +232,3 @@ p4.then((res) => {
   console.log('res', res)
 })
 
-
-function* myGenerator() {
-  console.log(yield Promise.resolve(1))   //1
-  console.log(yield Promise.resolve(2))   //2
-  console.log(yield Promise.resolve(3))   //3
-}
-
-// 手动执行迭代器
-const gen = myGenerator()
-gen.next().value.then(val => {
-  console.log('1', val)
-  gen.next(val).value.then(val => {
-    console.log('2', val)
-    gen.next(val).value.then(val => {
-      console.log('3', val)
-      gen.next(val)
-    })
-  })
-})
